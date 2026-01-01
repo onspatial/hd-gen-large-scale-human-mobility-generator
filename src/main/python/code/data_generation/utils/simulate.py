@@ -7,12 +7,12 @@ from random import random
 import time
 import os
 import subprocess
-def run(params, shuffle=True, fork_join=True, check_time=6000, parallel=get_parallel_runs(type="dynamic")):
+def run(params, shuffle=True, batch_processing=True, check_time=6000, parallel=get_parallel_runs(type="dynamic")):
     print(len(params), "params received...")
     if shuffle:
         params = shuffle_params(params)
     configured_params = get_configure_params(params)
-    configured_params = run_configured_params(configured_params, fork_join=fork_join, check_time=check_time, parallel=parallel)
+    configured_params = run_configured_params(configured_params, batch_processing=batch_processing, check_time=check_time, parallel=parallel)
     configured_params = get_scored_params(configured_params)
     save_params_to_file(configured_params)
     
@@ -22,10 +22,10 @@ def shuffle_params(params):
     print("shuffling params...")
     return sorted(params, key=lambda x: random())
 
-def run_configured_params(configured_params, parallel=get_parallel_runs(type="not-dynamic"), fork_join=True, check_time=60):
-    print(f"running {len(configured_params)} configured params... with fork_join={fork_join}")
-    if  fork_join:
-        configured_params = run_fork_join(configured_params, parallel)
+def run_configured_params(configured_params, parallel=get_parallel_runs(type="not-dynamic"), batch_processing=True, check_time=60):
+    print(f"running {len(configured_params)} configured params... with batch_processing={batch_processing}")
+    if  batch_processing:
+        configured_params = run_batch_processing(configured_params, parallel)
     else:
         configured_params = run_in_queue(configured_params, parallel, check_time)
     return configured_params
@@ -82,7 +82,7 @@ def prepare_shell(configured_param, output_path="tmp/run.sh", append=True, comma
                 'command':command}
     return respond
 
-def run_fork_join(configured_params, parallel):
+def run_batch_processing(configured_params, parallel):
     count = 0
     for configured_param in configured_params:
         count += 1

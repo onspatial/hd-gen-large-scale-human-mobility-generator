@@ -32,7 +32,7 @@ if __name__ == "__main__":
         pool_params = get_pool_params()       
         layer_params = get_layer_params(pool_params, run_id)
         # test_middle()
-        layer_params = run(layer_params, fork_join=False, check_time=100,parallel=8)
+        layer_params = run(layer_params, batch_processing=False, check_time=100,parallel=8)
         save_params_to_file(layer_params, f"pole/params.{run_id}.json")
         update_pool(pool_params, layer_params, layer_level)
     print(f"Calibration completed successfully with {layer_level} iterations...")
